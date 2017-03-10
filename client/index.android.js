@@ -1,95 +1,26 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- * @flow
- */
-
 import React, { Component } from 'react';
 import {
   AppRegistry,
   StyleSheet,
   Text,
-  View,
-  Dimensions,
-  Image
+  View
 } from 'react-native';
-import Camera from 'react-native-camera';
+import { Router, Scene } from 'react-native-router-flux';
 
-export default class CamerApp extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      bounds: { origin: { x: 0, y: 0 }, size: { height: 0, width: 0 } },
-      opacity: 0,
-    };
-  }
+import camHomePage from './app/camHomePage';
+import friendMessage from './app/friendMessage';
 
-  readQR(e) {
-    //alert(e.size);
-    if (e.data) {
-      if (e.data == 'Hello :)') {
-        this.setState({ opacity: 1 });
-      } else {
-        this.setState({ opacity: 0 });
-      }
-      //this.setState({ bounds: e, data: e.data });
-    }
-  }
-
+export default class locMemo extends Component {
   render() {
     return (
-      <View style={styles.container}>
-        <Camera
-          ref={(cam) => {
-            this.camera = cam;
-          } }
-          style={styles.preview}
-          aspect={Camera.constants.Aspect.fill} onBarCodeRead={this.readQR.bind(this)} >
-          <Text style={styles.capture} onPress={this.takePicture.bind(this)}>[CAPTURE]</Text>
-          <Image
-            style={{
-              opacity: this.state.opacity,
-              height: 50, //parseInt(this.state.bounds.size.height),
-              width: 50, //parseInt(this.state.bounds.size.width),
-              left: 50, //parseInt(this.state.bounds.origin.x),
-              top: 50, //parseInt(this.state.bounds.origin.y),
-              justifyContent: "center",
-              alignItems: "center",
-              resizeMode: 'stretch',
-              position: 'absolute'
-            }}
-            source={require('./assets/img/smiley.png')}
-            />
-        </Camera>
-      </View>
-    );
-  }
-  takePicture() {
-    this.camera.capture()
-      .then((data) => console.log(data))
-      .catch(err => console.error(err));
+      <Router>
+        <Scene key="root">
+          <Scene key="camHomePage" component={camHomePage} title="camHomePage" initial={true} />
+          <Scene key="friendMessage" component={friendMessage} title="friendMessage" />
+        </Scene>
+      </Router>
+    )
   }
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1
-  },
-  preview: {
-    flex: 1,
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-    height: Dimensions.get('window').height,
-    width: Dimensions.get('window').width
-  },
-  capture: {
-    flex: 0,
-    backgroundColor: '#fff',
-    borderRadius: 5,
-    color: '#000',
-    padding: 10,
-    margin: 40
-  }
-});
-
-AppRegistry.registerComponent('CamerApp', () => CamerApp);
+AppRegistry.registerComponent('locMemo', () => locMemo);
