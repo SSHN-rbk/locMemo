@@ -1,7 +1,58 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, Image, Dimensions } from 'react-native';
+import {
+  View, Text, StyleSheet, Dimensions, TouchableOpacity, Platform,
+  Image,
+  ActivityIndicator
+} from 'react-native';
 import { Actions } from 'react-native-router-flux';
 import Camera from 'react-native-camera';
+import ImagePicker from 'react-native-image-picker'
+import RNFetchBlob from 'react-native-fetch-blob'
+import firebase from 'firebase'
+
+const config = {
+  apiKey: "AIzaSyC0SrkXiPruVpvsCBXV0Z5-thtKOC20U1E",
+  authDomain: "https://awsomproject-7ab1b.firebaseio.com",
+  storageBucket: "gs://awsomproject-7ab1b.appspot.com",
+}
+firebase.initializeApp(config)
+const storage = firebase.storage()
+
+// Prepare Blob support
+const Blob = RNFetchBlob.polyfill.Blob
+const fs = RNFetchBlob.fs
+window.XMLHttpRequest = RNFetchBlob.polyfill.XMLHttpRequest
+window.Blob = Blob
+
+const uploadImage = (uri, mime = 'application/octet-stream') => {
+  return new Promise((resolve, reject) => {
+    const uploadUri = Platform.OS === 'ios' ? uri.replace('file://', '') : uri
+    const sessionId = new Date().getTime()
+    let uploadBlob = null
+    const imageRef = storage.ref('images').child(`${sessionId}`)
+
+    fs.readFile(uploadUri, 'base64')
+      .then((data) => {
+        return Blob.build(data, { type: `${mime};BASE64` })
+      })
+      .then((blob) => {
+        uploadBlob = blob
+        return imageRef.put(blob, { contentType: mime })
+      })
+      .then(() => {
+        uploadBlob.close()
+        return imageRef.getDownloadURL()
+      })
+      .then((url) => {
+        resolve(url)
+      })
+      .catch((error) => {
+        reject(error)
+      })
+  })
+}
+
+
 
 export default class camHomePage extends Component {
   constructor(props) {
@@ -12,11 +63,21 @@ export default class camHomePage extends Component {
     };
   }
 
+  _pickImage() {
+    this.setState({ uploadURL: '' })
+
+    ImagePicker.launchImageLibrary({}, response => {
+      uploadImage(response.uri)
+        .then(url => this.setState({ uploadURL: url }))
+        .catch(error => console.log(error))
+    })
+  }
+
 
   readQR(e) {
     //console.error(e);
     if (e.data) {
-      if (e.data == 'http://q-r.to/bajUqM') {
+      if (e.data == 'Hello :)') {
         this.setState({ opacity: 1 });
       } else {
         this.setState({ opacity: 0 });
@@ -36,10 +97,36 @@ export default class camHomePage extends Component {
           aspect={Camera.constants.Aspect.fill} onBarCodeRead={this.readQR.bind(this)} >
           <Text style={styles.capture} onPress={this.takePicture.bind(this)}>[CAPTURE]</Text>
           <Text style={styles.capture} onPress={Actions.friendMessage}>[friendMessage]</Text>
+          {
+            (() => {
+              switch (this.state.uploadURL) {
+                case null:
+                  return null
+                case '':
+                  return <ActivityIndicator />
+                default:
+                  return (
+                    <View>
+                      <Image
+                        source={{ uri: this.state.uploadURL }}
+                        style={styles.image}
+                        />
+                      <Text>{this.state.uploadURL}</Text>
+                    </View>
+                  )
+              }
+            })()
+          }
+          <TouchableOpacity onPress={() => this._pickImage()}>
+            <Text style={styles.capture}>
+              Upload
+          </Text>
+          </TouchableOpacity>
+          
           <Image
             style={{
               opacity: this.state.opacity,
-              height:  50,//parseInt(this.state.bounds.size.height),
+              height: 50,//parseInt(this.state.bounds.size.height),
               width: 50,//parseInt(this.state.bounds.size.width),
               left: 50,//parseInt(this.state.bounds.origin.x),
               top: 50,//parseInt(this.state.bounds.origin.y),
@@ -56,7 +143,7 @@ export default class camHomePage extends Component {
   }
   takePicture() {
     this.camera.capture()
-      .then((data) => console.log(data))
+      .then((data) => uploadImage(data.path))
       .catch(err => console.error(err));
   }
 }
