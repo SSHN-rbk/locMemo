@@ -33,7 +33,7 @@ const uploadImage = (uri, mime = 'application/octet-stream') => {
 
     //calling function that go to friends page and pass image url
     goToFriendMessage(uri);
-    
+
     fs.readFile(uploadUri, 'base64')
       .then((data) => {
         return Blob.build(data, { type: `${mime};BASE64` })
@@ -63,8 +63,47 @@ export default class camHomePage extends Component {
     this.state = {
       bounds: { origin: { x: 0, y: 0 }, size: { height: 0, width: 0 } },
       opacity: 0,
+      initialPosition: 'unknown',
+      lastPosition: 'unknown'
     };
   }
+
+
+
+  //location section 
+  watchID: ?number = null;
+  componentDidMount() {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        var initialPosition = position.coords.longitude//JSON.stringify(position);
+        this.setState({ initialPosition });
+      },
+      (error) => alert(JSON.stringify(error)),
+      { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
+    );
+    this.watchID = navigator.geolocation.watchPosition((position) => {
+      //console.log(position)
+      var lastPosition = position.coords.longitude//JSON.stringify(position);
+      this.setState({ lastPosition });
+      if (lastPosition.toString() == this.state.initialPosition) {
+        console.log('yes')
+        this.setState({ opacity: 1 });
+      } else {
+        console.log('no')
+        this.setState({ opacity: 0 });
+      }
+    });
+  }
+
+  componentWillUnmount() {
+    navigator.geolocation.clearWatch(this.watchID);
+  }
+
+  //location section 
+
+
+
+
 
   _pickImage() {
     this.setState({ uploadURL: '' })
@@ -101,6 +140,18 @@ export default class camHomePage extends Component {
           } }
           style={styles.preview}
           aspect={Camera.constants.Aspect.fill} onBarCodeRead={this.readQR.bind(this)} >
+
+          <View>
+            <Text>
+              <Text style={styles.title}>Initial position: </Text>
+              {this.state.initialPosition}
+            </Text>
+            <Text>
+              <Text style={styles.title}>Current position: </Text>
+              {this.state.lastPosition}
+            </Text>
+          </View>
+
           <Text style={styles.capture} onPress={this.takePicture.bind(this)}>[CAPTURE]</Text>
           <Text style={styles.capture} onPress={goToFriendMessage}>[friendMessage]</Text>
           {
