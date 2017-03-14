@@ -31,6 +31,9 @@ const uploadImage = (uri, mime = 'application/octet-stream') => {
     let uploadBlob = null
     const imageRef = storage.ref('images').child(`${sessionId}`)
 
+    //calling function that go to friends page and pass image url
+    goToFriendMessage(uri);
+    
     fs.readFile(uploadUri, 'base64')
       .then((data) => {
         return Blob.build(data, { type: `${mime};BASE64` })
@@ -52,7 +55,7 @@ const uploadImage = (uri, mime = 'application/octet-stream') => {
   })
 }
 
-
+const goToFriendMessage = (dosom) => Actions.friendMessage({ text: dosom });
 
 export default class camHomePage extends Component {
   constructor(props) {
@@ -86,7 +89,10 @@ export default class camHomePage extends Component {
     }
   }
 
+
+
   render() {
+
     return (
       <View style={styles.container}>
         <Camera
@@ -96,7 +102,7 @@ export default class camHomePage extends Component {
           style={styles.preview}
           aspect={Camera.constants.Aspect.fill} onBarCodeRead={this.readQR.bind(this)} >
           <Text style={styles.capture} onPress={this.takePicture.bind(this)}>[CAPTURE]</Text>
-          <Text style={styles.capture} onPress={Actions.friendMessage}>[friendMessage]</Text>
+          <Text style={styles.capture} onPress={goToFriendMessage}>[friendMessage]</Text>
           {
             (() => {
               switch (this.state.uploadURL) {
@@ -122,7 +128,7 @@ export default class camHomePage extends Component {
               Upload
           </Text>
           </TouchableOpacity>
-          
+
           <Image
             style={{
               opacity: this.state.opacity,
