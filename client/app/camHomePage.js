@@ -147,13 +147,13 @@ export default class camHomePage extends Component {
           style={styles.preview}
           aspect={Camera.constants.Aspect.fill} onBarCodeRead={this.readQR.bind(this)} >
               
-<Icon name="rocket" size={30} color="#900" />
 
-<Text 
-style={styles.capture}
-onPress={this.takePicture.bind(this)}>
-<Icon active name='camera' />
-</Text>
+<Icon name="camera"
+size={100} 
+color="#22c7e8" 
+onPress={this.takePicture.bind(this)} />
+
+
 
          
           {
