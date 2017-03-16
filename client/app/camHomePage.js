@@ -71,7 +71,7 @@ export default class camHomePage extends Component {
 
 
   //location section 
-  watchID: ?number = null;
+  //watchID: ?number = null;
   componentDidMount() {
     navigator.geolocation.getCurrentPosition(
       (position) => {
@@ -79,9 +79,9 @@ export default class camHomePage extends Component {
         this.setState({ initialPosition });
       },
       (error) => alert(JSON.stringify(error)),
-      { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
+      { enableHighAccuracy: true,distanceFilter:1 ,timeout: 20000, maximumAge: 500}
     );
-    this.watchID = navigator.geolocation.watchPosition((position) => {
+    var watchID = navigator.geolocation.watchPosition((position) => {
       //console.log(position)
       var lastPosition = position.coords.longitude//JSON.stringify(position);
       this.setState({ lastPosition });
@@ -92,12 +92,15 @@ export default class camHomePage extends Component {
         console.log('no')
         this.setState({ opacity: 0 });
       }
-    });
+    },
+    (error) => alert(JSON.stringify(error)),
+    { enableHighAccuracy: true,distanceFilter:1 ,timeout: 20000, maximumAge: 500}
+    );
   }
 
-  componentWillUnmount() {
-    navigator.geolocation.clearWatch(this.watchID);
-  }
+  // componentWillUnmount() {
+  //   navigator.geolocation.clearWatch(this.watchID);
+  // }
 
   //location section 
 
