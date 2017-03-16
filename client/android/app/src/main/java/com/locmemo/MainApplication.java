@@ -9,6 +9,7 @@ import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
 import com.RNFetchBlob.RNFetchBlobPackage;
+import com.oblador.vectoricons.VectorIconsPackage;
 
 
 import java.util.Arrays;
@@ -28,7 +29,9 @@ public class MainApplication extends Application implements ReactApplication {
           new MainReactPackage(),
             new RCTCameraPackage(),
               new RNFetchBlobPackage(),
-              new ImagePickerPackage()  
+              new ImagePickerPackage() ,
+               new VectorIconsPackage()
+              
       );
     }
   };

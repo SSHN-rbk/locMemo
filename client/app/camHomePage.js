@@ -4,6 +4,9 @@ import {
   Image,
   ActivityIndicator
 } from 'react-native';
+import { Container, Content, Button} from 'native-base';
+import Icon from 'react-native-vector-icons/FontAwesome';
+
 import { Actions } from 'react-native-router-flux';
 import Camera from 'react-native-camera';
 import ImagePicker from 'react-native-image-picker'
@@ -143,20 +146,16 @@ export default class camHomePage extends Component {
           } }
           style={styles.preview}
           aspect={Camera.constants.Aspect.fill} onBarCodeRead={this.readQR.bind(this)} >
+              
+<Icon name="rocket" size={30} color="#900" />
 
-          <View>
-            <Text>
-              <Text style={styles.title}>Initial position: </Text>
-              {this.state.initialPosition}
-            </Text>
-            <Text>
-              <Text style={styles.title}>Current position: </Text>
-              {this.state.lastPosition}
-            </Text>
-          </View>
+<Text 
+style={styles.capture}
+onPress={this.takePicture.bind(this)}>
+<Icon active name='camera' />
+</Text>
 
-          <Text style={styles.capture} onPress={this.takePicture.bind(this)}>[CAPTURE]</Text>
-          <Text style={styles.capture} onPress={goToFriendMessage}>[friendMessage]</Text>
+         
           {
             (() => {
               switch (this.state.uploadURL) {
@@ -177,12 +176,7 @@ export default class camHomePage extends Component {
               }
             })()
           }
-          <TouchableOpacity onPress={() => this._pickImage()}>
-            <Text style={styles.capture}>
-              Upload
-          </Text>
-          </TouchableOpacity>
-
+        
           <Image
             style={{
               opacity: this.state.opacity,
@@ -221,10 +215,13 @@ const styles = StyleSheet.create({
   },
   capture: {
     flex: 0,
-    backgroundColor: '#fff',
-    borderRadius: 5,
+    backgroundColor:color="#1bb4ba",
+    borderRadius: 25,
     color: '#000',
     padding: 10,
-    margin: 40
+    margin: 40,
+    width : 50,
+    height : 50 ,
+     alignItems: 'center'
   }
 });
