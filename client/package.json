@@ -32,6 +32,11 @@
     "react-test-renderer": "15.4.2"
   },
   "jest": {
-    "preset": "react-native"
+    "preset": "react-native",
+     "setupFiles": ["./jest/setup.js"],
+"transformIgnorePatterns": [
+  "node_modules/(?!react-native|my-project|react-native-button)/"
+]
+
   }
 }
