@@ -1,0 +1,30 @@
+{
+  "name": "apisprint",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon server/server.js"
+  },
+  "repository": {
+    "type": "git"
+  },
+  "author": "sshn",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "browser-sync": "^2.14.0",
+    "express": "^4.14.0",
+    "mocha": "^3.2.0",
+    "morgan": "^1.7.0",
+    "mysql": "^2.13.0",
+    "request": "^2.74.0",
+    "sequelize": "^3.30.2"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "eslint": "^3.16.1",
+    "eslint-plugin-react": "^6.10.0",
+    "supertest": "^3.0.0"
+  }
+}
