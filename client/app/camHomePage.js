@@ -4,6 +4,9 @@ import {
   Image,
   ActivityIndicator
 } from 'react-native';
+import { Container, Content, Button} from 'native-base';
+import Icon from 'react-native-vector-icons/FontAwesome';
+
 import { Actions } from 'react-native-router-flux';
 import Camera from 'react-native-camera';
 import ImagePicker from 'react-native-image-picker'
@@ -33,7 +36,7 @@ const uploadImage = (uri, mime = 'application/octet-stream') => {
 
     //calling function that go to friends page and pass image url
     goToFriendMessage(uri);
-    
+
     fs.readFile(uploadUri, 'base64')
       .then((data) => {
         return Blob.build(data, { type: `${mime};BASE64` })
@@ -63,8 +66,50 @@ export default class camHomePage extends Component {
     this.state = {
       bounds: { origin: { x: 0, y: 0 }, size: { height: 0, width: 0 } },
       opacity: 0,
+      initialPosition: 'unknown',
+      lastPosition: 'unknown'
     };
   }
+
+
+
+  //location section 
+  //watchID: ?number = null;
+  componentDidMount() {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        var initialPosition = position.coords.longitude//JSON.stringify(position);
+        this.setState({ initialPosition });
+      },
+      (error) => alert(JSON.stringify(error)),
+      { enableHighAccuracy: true,distanceFilter:1 ,timeout: 20000, maximumAge: 500}
+    );
+    var watchID = navigator.geolocation.watchPosition((position) => {
+      //console.log(position)
+      var lastPosition = position.coords.longitude//JSON.stringify(position);
+      this.setState({ lastPosition });
+      if (lastPosition.toString() == this.state.initialPosition) {
+        console.log('yes')
+        this.setState({ opacity: 1 });
+      } else {
+        console.log('no')
+        this.setState({ opacity: 0 });
+      }
+    },
+    (error) => alert(JSON.stringify(error)),
+    { enableHighAccuracy: true,distanceFilter:1 ,timeout: 20000, maximumAge: 500}
+    );
+  }
+
+  // componentWillUnmount() {
+  //   navigator.geolocation.clearWatch(this.watchID);
+  // }
+
+  //location section 
+
+
+
+
 
   _pickImage() {
     this.setState({ uploadURL: '' })
@@ -101,8 +146,16 @@ export default class camHomePage extends Component {
           } }
           style={styles.preview}
           aspect={Camera.constants.Aspect.fill} onBarCodeRead={this.readQR.bind(this)} >
-          <Text style={styles.capture} onPress={this.takePicture.bind(this)}>[CAPTURE]</Text>
-          <Text style={styles.capture} onPress={goToFriendMessage}>[friendMessage]</Text>
+              
+
+<Icon name="camera"
+size={100} 
+color="#22c7e8" 
+onPress={this.takePicture.bind(this)} />
+
+
+
+         
           {
             (() => {
               switch (this.state.uploadURL) {
@@ -123,12 +176,7 @@ export default class camHomePage extends Component {
               }
             })()
           }
-          <TouchableOpacity onPress={() => this._pickImage()}>
-            <Text style={styles.capture}>
-              Upload
-          </Text>
-          </TouchableOpacity>
-
+        
           <Image
             style={{
               opacity: this.state.opacity,
@@ -167,10 +215,13 @@ const styles = StyleSheet.create({
   },
   capture: {
     flex: 0,
-    backgroundColor: '#fff',
-    borderRadius: 5,
+    backgroundColor:color="#1bb4ba",
+    borderRadius: 25,
     color: '#000',
     padding: 10,
-    margin: 40
+    margin: 40,
+    width : 50,
+    height : 50 ,
+     alignItems: 'center'
   }
 });
