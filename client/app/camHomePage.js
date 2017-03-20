@@ -17,54 +17,23 @@ const config = {
   apiKey: "AIzaSyC0SrkXiPruVpvsCBXV0Z5-thtKOC20U1E",
   authDomain: "https://awsomproject-7ab1b.firebaseio.com",
   //
-   databaseURL: "https://awsomproject-7ab1b.firebaseio.com",
+  databaseURL: "https://awsomproject-7ab1b.firebaseio.com",
    //
-  storageBucket: "gs://awsomproject-7ab1b.appspot.com",
-}
-const App = firebase.initializeApp(config)
-const storage = firebase.storage()
+   storageBucket: "gs://awsomproject-7ab1b.appspot.com",
+ }
+ export const App = firebase.initializeApp(config)
+ const storage = firebase.storage()
 
 // Prepare Blob support
 const Blob = RNFetchBlob.polyfill.Blob
 const fs = RNFetchBlob.fs
 window.XMLHttpRequest = RNFetchBlob.polyfill.XMLHttpRequest
 window.Blob = Blob
+export let  tempArray=[];
 
-const uploadImage = (uri, long,att,mime = 'application/octet-stream') => {
-  //console.log('here')
-  return new Promise((resolve, reject) => {
-    const uploadUri = Platform.OS === 'ios' ? uri.replace('file://', '') : uri
-    const sessionId = new Date().getTime()
-    let uploadBlob = null
-    const imageRef = storage.ref('images').child(`${sessionId}`)
 
-    //calling function that go to friends page and pass image url
-    goToFriendMessage(uri);
 
-    fs.readFile(uploadUri, 'base64')
-      .then((data) => {
-        return Blob.build(data, { type: `${mime};BASE64` })
-      })
-      .then((blob) => {
-        uploadBlob = blob
-        return imageRef.put(blob, { contentType: mime })
-      })
-      .then(() => {
-        uploadBlob.close()
-        return imageRef.getDownloadURL()
-      })
-      .then((url) => {
-        console.log(url)
-        App.database().ref('users').push({url: url,l:long,a:att})
-        resolve(url)
-      })
-      .catch((error) => {
-        reject(error)
-      })
-  })
-}
-
-const goToFriendMessage = (dosom) => Actions.friendMessage({ text: dosom });
+//const goToFriendMessage = (long) => Actions.friendMessage({ long:long });
 
 export default class camHomePage extends Component {
   constructor(props) {
@@ -89,11 +58,13 @@ export default class camHomePage extends Component {
       },
       (error) => alert(JSON.stringify(error)),
       { enableHighAccuracy: true,distanceFilter:1 ,timeout: 20000, maximumAge: 500}
-    );
+      );
     var watchID = navigator.geolocation.watchPosition((position) => {
       //console.log(position)
       var lastPosition = {Long:position.coords.longitude,att:position.coords.latitude};//position.coords.longitude//JSON.stringify(position);
       this.setState({ lastPosition });
+      console.log(this.state.lastPosition)
+
       if (lastPosition.toString() == this.state.initialPosition) {
         console.log('yes')
         this.setState({ opacity: 1 });
@@ -107,13 +78,38 @@ export default class camHomePage extends Component {
     );
   }
 
-  // componentWillUnmount() {
-  //   navigator.geolocation.clearWatch(this.watchID);
-  // }
 
-  //location section 
-
-
+  uploadImage (uri, long,att,mime = 'application/octet-stream')  {
+    return new Promise((resolve, reject) => {
+      const uploadUri = Platform.OS === 'ios' ? uri.replace('file://', '') : uri
+      const sessionId = new Date().getTime()
+      let uploadBlob = null
+      const imageRef = storage.ref('images').child(`${sessionId}`)
+      fs.readFile(uploadUri, 'base64')
+      .then((data) => {
+        return Blob.build(data, { type: `${mime};BASE64` })
+      })
+      .then((blob) => {
+        uploadBlob = blob
+        return imageRef.put(blob, { contentType: mime })
+      })
+      .then(() => {
+        uploadBlob.close()
+        return imageRef.getDownloadURL()
+      })
+      .then((url) => {
+        console.log(long)
+        var that = this;
+        App.database().ref('users').push({url: url,l:long,a:att}).then(function(){
+        that.goToFriendMessage(long)
+       })
+        resolve(url)
+      })
+      .catch((error) => {
+        reject(error)
+      })
+    })
+  }
 
 
 
@@ -122,8 +118,8 @@ export default class camHomePage extends Component {
 
     ImagePicker.launchImageLibrary({}, response => {
       uploadImage(response.uri)
-        .then(url => this.setState({ uploadURL: url }))
-        .catch(error => console.log(error))
+      .then(url => this.setState({ uploadURL: url }))
+      .catch(error => console.log(error))
     })
   }
 
@@ -146,89 +142,77 @@ export default class camHomePage extends Component {
 
     return (
       <View style={styles.container}>
-        <Camera
-          ref={(cam) => {
-            this.camera = cam;
-          } }
-          style={styles.preview}
-          aspect={Camera.constants.Aspect.fill} onBarCodeRead={this.readQR.bind(this)} >
-              
-
-<Icon name="camera"
-size={100} 
-color="#22c7e8" 
-onPress={this.takePicture.bind(this,this.state.lastPosition)} />
+      <Camera
+      ref={(cam) => {
+        this.camera = cam;
+      } }
+      style={styles.preview}
+      aspect={Camera.constants.Aspect.fill} onBarCodeRead={this.readQR.bind(this)} >
 
 
+      <Icon name="camera" size={100}  onPress={this.goToFriendMessage.bind(this,this.state.lastPosition.Long)} />
 
-         
-          {
-            (() => {
-              switch (this.state.uploadURL) {
-                case null:
-                  return null
-                case '':
-                  return <ActivityIndicator />
-                default:
-                  return (
-                    <View>
-                      <Image
-                        source={{ uri: this.state.uploadURL }}
-                        style={styles.image}
-                        />
-                      <Text>{this.state.uploadURL}</Text>
-                    </View>
-                  )
-              }
-            })()
-          }
+      <Icon name="camera"
+      size={100} 
+      color="#22c7e8" 
+      onPress={this.takePicture.bind(this,this.state.lastPosition)} />
+      {
+        (() => {
+          switch (this.state.uploadURL) {
+            case null:
+            return null
+            case '':
+            return <ActivityIndicator />
+            default:
+            return (
+              <View>
+              <Image
+              source={{ uri: this.state.uploadURL }}
+              style={styles.image}
+              />
+              <Text>{this.state.uploadURL}</Text>
+              </View>
+              )
+            }
+          })()
+        }
         
-          <Image
-            style={{
-              opacity: this.state.opacity,
-              height: 50,//parseInt(this.state.bounds.size.height),
-              width: 50,//parseInt(this.state.bounds.size.width),
-              left: 50,//parseInt(this.state.bounds.origin.x),
-              top: 50,//parseInt(this.state.bounds.origin.y),
-              justifyContent: "center",
-              alignItems: "center",
-              resizeMode: 'stretch',
-              position: 'absolute'
-            }}
-            source={require('./../assets/img/smiley.png')}
-            />
+        <Image
+        style={{
+          opacity: this.state.opacity,
+          height: 50,//parseInt(this.state.bounds.size.height),
+          width: 50,//parseInt(this.state.bounds.size.width),
+          left: 50,//parseInt(this.state.bounds.origin.x),
+          top: 50,//parseInt(this.state.bounds.origin.y),
+          justifyContent: "center",
+          alignItems: "center",
+          resizeMode: 'stretch',
+          position: 'absolute'
+        }}
+        source={require('./../assets/img/smiley.png')}
+        />
         </Camera>
-      </View>
-    );
-  }
-  takePicture(location) {
-    console.log(location)
-    this.camera.capture()
-      .then((data) => uploadImage(data.path,location.Long,location.att))
-      .catch(err => console.error(err));
-  }
-}
+        </View>
+        );
+          }
+          takePicture(location) {
+            console.log(location)
+            this.camera.capture()
+            .then((data) => this.uploadImage(data.path,location.Long,location.att))
+            .catch(err => console.error(err));
+          }
+          goToFriendMessage (long) {console.log('bef'), Actions.friendMessage({ long:long }), console.log('after')};
+        }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1
-  },
-  preview: {
-    flex: 1,
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-    height: Dimensions.get('window').height,
-    width: Dimensions.get('window').width
-  },
-  capture: {
-    flex: 0,
-    backgroundColor:color="#1bb4ba",
-    borderRadius: 25,
-    color: '#000',
-    padding: 10,
-    margin: 40,
-    width : 50,
-    height : 50 ,
-     alignItems: 'center'
-  }
-});
+
+
+
+        const styles = StyleSheet.create({
+          container: {
+            flex: 1
+          },
+          preview: {
+            flex: 1,
+            justifyContent: 'flex-end',
+            alignItems: 'center',
+            height: Dimensions.get('window').heig
