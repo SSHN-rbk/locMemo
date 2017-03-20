@@ -16,9 +16,12 @@ import firebase from 'firebase'
 const config = {
   apiKey: "AIzaSyC0SrkXiPruVpvsCBXV0Z5-thtKOC20U1E",
   authDomain: "https://awsomproject-7ab1b.firebaseio.com",
+  //
+   databaseURL: "https://awsomproject-7ab1b.firebaseio.com",
+   //
   storageBucket: "gs://awsomproject-7ab1b.appspot.com",
 }
-firebase.initializeApp(config)
+const App = firebase.initializeApp(config)
 const storage = firebase.storage()
 
 // Prepare Blob support
@@ -27,7 +30,8 @@ const fs = RNFetchBlob.fs
 window.XMLHttpRequest = RNFetchBlob.polyfill.XMLHttpRequest
 window.Blob = Blob
 
-const uploadImage = (uri, mime = 'application/octet-stream') => {
+const uploadImage = (uri, long,att,mime = 'application/octet-stream') => {
+  //console.log('here')
   return new Promise((resolve, reject) => {
     const uploadUri = Platform.OS === 'ios' ? uri.replace('file://', '') : uri
     const sessionId = new Date().getTime()
@@ -50,6 +54,8 @@ const uploadImage = (uri, mime = 'application/octet-stream') => {
         return imageRef.getDownloadURL()
       })
       .then((url) => {
+        console.log(url)
+        App.database().ref('users').push({url: url,l:long,a:att})
         resolve(url)
       })
       .catch((error) => {
@@ -86,7 +92,7 @@ export default class camHomePage extends Component {
     );
     var watchID = navigator.geolocation.watchPosition((position) => {
       //console.log(position)
-      var lastPosition = position.coords.longitude//JSON.stringify(position);
+      var lastPosition = {Long:position.coords.longitude,att:position.coords.latitude};//position.coords.longitude//JSON.stringify(position);
       this.setState({ lastPosition });
       if (lastPosition.toString() == this.state.initialPosition) {
         console.log('yes')
@@ -151,7 +157,7 @@ export default class camHomePage extends Component {
 <Icon name="camera"
 size={100} 
 color="#22c7e8" 
-onPress={this.takePicture.bind(this)} />
+onPress={this.takePicture.bind(this,this.state.lastPosition)} />
 
 
 
@@ -195,9 +201,10 @@ onPress={this.takePicture.bind(this)} />
       </View>
     );
   }
-  takePicture() {
+  takePicture(location) {
+    console.log(location)
     this.camera.capture()
-      .then((data) => uploadImage(data.path))
+      .then((data) => uploadImage(data.path,location.Long,location.att))
       .catch(err => console.error(err));
   }
 }
