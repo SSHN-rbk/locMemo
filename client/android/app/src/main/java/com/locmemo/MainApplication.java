@@ -3,6 +3,16 @@ package com.locmemo;
 import android.app.Application;
 import com.imagepicker.ImagePickerPackage; 
 import com.facebook.react.ReactApplication;
+import com.oblador.vectoricons.VectorIconsPackage;
+import com.imagepicker.ImagePickerPackage;
+import com.RNFetchBlob.RNFetchBlobPackage;
+import com.facebook.reactnative.androidsdk.FBSDKPackage;
+import com.lwansbrough.RCTCamera.RCTCameraPackage;
+import com.oblador.vectoricons.VectorIconsPackage;
+import com.imagepicker.ImagePickerPackage;
+import com.RNFetchBlob.RNFetchBlobPackage;
+import com.facebook.reactnative.androidsdk.FBSDKPackage;
+import com.lwansbrough.RCTCamera.RCTCameraPackage;
 import com.lwansbrough.RCTCamera.RCTCameraPackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
@@ -17,6 +27,8 @@ import java.util.List;
 
 public class MainApplication extends Application implements ReactApplication {
 
+
+
   private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
     @Override
     public boolean getUseDeveloperSupport() {
@@ -27,10 +39,12 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
-            new RCTCameraPackage(),
-              new RNFetchBlobPackage(),
-              new ImagePickerPackage() ,
-               new VectorIconsPackage()
+            new VectorIconsPackage(),
+            new ImagePickerPackage(),
+            new RNFetchBlobPackage(),
+            new RCTCameraPackage()
+             // new FBSDKPackage(mCallbackManager)
+
               
       );
     }
