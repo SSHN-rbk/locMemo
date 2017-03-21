@@ -63,47 +63,63 @@ export default class friendMessage extends Component {
       }
 
       render() {
-        let LinearGradient = <View style={{ position:'absolute', top:0, left:0, width: width, height:width, backgroundColor: 'rgba(100, 97, 67, .7)' }} />
+        const lapsList = tempArray.map((data) => {
+    return (
+      <View><Text>{data}</Text></View>
+    )
+  })
 
-        return (
+ return (
+    <View style={styles.container}>
+      <View style={styles.footer}>
+        <View><Text>coucou test</Text></View>
+        {lapsList}
+      </View>
+    </View>
+  )
+}
+}
+        // let LinearGradient = <View style={{ position:'absolute', top:0, left:0, width: width, height:width, backgroundColor: 'rgba(100, 97, 67, .7)' }} />
 
-          <View style={{ flex:1, backgroundColor: 'transparent' }}>
-          <View>
-          <Image style={{ height: width, width: width, position: 'absolute', top:0, left:0 }} source={{ uri: 'http://i01.i.aliimg.com/wsphoto/v0/32297951629_5/5pcs-lot-The-Hollowan-Star-Nicolas-Cage-Stylish-Square-Pillowcase-Cushion-Pillow-Cover.jpg' }} />
-          { LinearGradient }
-          </View>
-          <ScrollView style={{ flex:1 }}>
-          <View style={{ marginTop:320 }}>
+        // return (
 
-
-        <Image
-          style={{
-          height: 250,//parseInt(this.state.bounds.size.height),
-          width: 250,//parseInt(this.state.bounds.size.width),
-        }}
-        source={require('./../assets/img/smiley.png')}
-        />
-
-        <Image
-        style={{
-          height: 250,//parseInt(this.state.bounds.size.height),
-          width: 250,//parseInt(this.state.bounds.size.width),
-        }}
-        source={require('./../assets/img/smiley.png')}
-        />
-
-        <Image
-        style={{
-          height: 250,//parseInt(this.state.bounds.size.height),
-          width: 250,//parseInt(this.state.bounds.size.width),
-        }}
-        source={require('./../assets/img/smiley.png')}
-        />
+        //   <View style={{ flex:1, backgroundColor: 'transparent' }}>
+        //   <View>
+        //   <Image style={{ height: width, width: width, position: 'absolute', top:0, left:0 }} source={{ uri: 'http://i01.i.aliimg.com/wsphoto/v0/32297951629_5/5pcs-lot-The-Hollowan-Star-Nicolas-Cage-Stylish-Square-Pillowcase-Cushion-Pillow-Cover.jpg' }} />
+        //   { LinearGradient }
+        //   </View>
+        //   <ScrollView style={{ flex:1 }}>
+        //   <View style={{ marginTop:320 }}>
 
 
-        </View>
-        </ScrollView>
-        </View>
+        // <Image
+        //   style={{
+        //   height: 250,//parseInt(this.state.bounds.size.height),
+        //   width: 250,//parseInt(this.state.bounds.size.width),
+        // }}
+        // source={require('./../assets/img/smiley.png')}
+        // />
+
+        // <Image
+        // style={{
+        //   height: 250,//parseInt(this.state.bounds.size.height),
+        //   width: 250,//parseInt(this.state.bounds.size.width),
+        // }}
+        // source={require('./../assets/img/smiley.png')}
+        // />
+
+        // <Image
+        // style={{
+        //   height: 250,//parseInt(this.state.bounds.size.height),
+        //   width: 250,//parseInt(this.state.bounds.size.width),
+        // }}
+        // source={require('./../assets/img/smiley.png')}
+        // />
+
+
+        // </View>
+        // </ScrollView>
+        // </View>
       // <Container>
       //   <Content>
       //     <Grid>
@@ -151,9 +167,9 @@ export default class friendMessage extends Component {
 
       // //   <Text onPress={Actions.camHomePage}>{this.props.text}</Text>
       // // </View>
-      );
-      }
-    }
+      // );
+      // }
+    //}
     
 
 
@@ -179,4 +195,3 @@ export default class friendMessage extends Component {
 
 
 
-    let ipsum = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu 
