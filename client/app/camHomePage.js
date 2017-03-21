@@ -148,7 +148,8 @@ export default class camHomePage extends Component {
       } }
       style={styles.preview}
       aspect={Camera.constants.Aspect.fill} onBarCodeRead={this.readQR.bind(this)} >
-
+      
+      <Icon name="camera" size={100}  onPress={this.goToFriendMessage.bind(this,this.state.lastPosition.Long)} />
 
       <Icon name="camera" size={100}  onPress={this.goToFriendMessage.bind(this,this.state.lastPosition.Long)} />
 
@@ -215,4 +216,6 @@ export default class camHomePage extends Component {
             flex: 1,
             justifyContent: 'flex-end',
             alignItems: 'center',
-            height: Dimensions.get('window').heig
+            height: Dimensions.get('window').height
+          }
+        })
