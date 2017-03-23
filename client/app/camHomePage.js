@@ -22,6 +22,7 @@ const config = {
  }
  export const App = firebase.initializeApp(config)
  const storage = firebase.storage()
+ const ref = App.database().ref('users')
 // Prepare Blob support
 const Blob = RNFetchBlob.polyfill.Blob
 const fs = RNFetchBlob.fs
@@ -38,113 +39,122 @@ export default class camHomePage extends Component {
       opacity: 0,
       initialPosition: 'unknown',
       lastPosition: 'unknown',
-       bounceValue: new Animated.Value(10),
+      bounceValue: new Animated.Value(10),
     };
   }
   //location section 
-  //watchID: ?number = null;
+  watchID: ?number = null;
   componentDidMount() {
-  setTimeout( () => {
-     this.setImage();
-     this.state.bounceValue.setValue(1.5);     // Start large
+    var that= this;
+  //     setTimeout( () => {
+  //    this.setImage();
+  //    this.state.bounceValue.setValue(1.5);     // Start large
+  //   Animated.spring(                          // Base: spring, decay, timing
+  //     this.state.bounceValue,                 // Animate `bounceValue`
+  //     {
+  //       toValue: 0.8,                         // Animate to smaller size
+  //       friction: 1,                          // Bouncier spring
+  //     }
+  //   ).start();     
+  // },1000);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+          var initialPosition = position.coords.longitude//JSON.stringify(position);
+          this.setState({ initialPosition });
+  },
+  (error) => console.log(JSON.stringify(error)),
+    { enableHighAccuracy: true,distanceFilter:1 ,timeout: 20000, maximumAge: 500}
+    );
+
+  watchID = navigator.geolocation.watchPosition((position) => {
+        //console.log(position)
+        var lastPosition = {Long:position.coords.longitude, att:position.coords.latitude};//position.coords.longitude//JSON.stringify(position);
+        this.setState({ lastPosition })
+        console.log(this.state.lastPosition)
+        console.log(lastPosition)
+
+        ref.orderByChild("a").equalTo(lastPosition.att).once('value', function (snap) {
+    var i = 0;
+    console.log('sdfsdfsdfsdf')
+  snap.forEach(function (userSnap) {
+    console.log('user %s is in position %d with %d points', userSnap.key, i++, userSnap.val());
+    if (userSnap.val().l === lastPosition.Long)
+      tempArray.push(userSnap.val().url)
+  });
+  if(tempArray.length === 0) {
+    that.setState({opacity: 0})
+  } else {
+    that.setState({opacity: 1})
+       that.state.bounceValue.setValue(1.5);     // Start large
     Animated.spring(                          // Base: spring, decay, timing
-      this.state.bounceValue,                 // Animate `bounceValue`
+      that.state.bounceValue,                 // Animate `bounceValue`
       {
         toValue: 0.8,                         // Animate to smaller size
         friction: 1,                          // Bouncier spring
       }
-    ).start();     
-  },20000);
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        var initialPosition = position.coords.longitude//JSON.stringify(position);
-        this.setState({ initialPosition });
-      },
-      (error) => console.log(JSON.stringify(error)),
-      { enableHighAccuracy: true,distanceFilter:1 ,timeout: 20000, maximumAge: 500}
-      );
-    
-    var watchID = navigator.geolocation.watchPosition((position) => {
-      //console.log(position)
-      var lastPosition = {Long:position.coords.longitude,att:position.coords.latitude};//position.coords.longitude//JSON.stringify(position);
-      this.setState({ lastPosition });
-      console.log(this.state.lastPosition)
-      if (lastPosition.toString() == this.state.initialPosition) {
-        console.log('yes')
-        this.setState({ opacity: 1 });
-      } else {
-        console.log('no')
-        this.setState({ opacity: 0 });
-      }
-    },
-    (error) => console.log(JSON.stringify(error)),
+    ).start();   
+  }
+console.log(tempArray);
+});
+        
+ 
+  },
+  (error) => console.log(JSON.stringify(error)),
     { enableHighAccuracy: true,distanceFilter:1 ,timeout: 20000, maximumAge: 500}
-    );
+    )
+
+  
+}
+
+componentWillUnmount() {
+    navigator.geolocation.clearWatch(this.watchID);
   }
-  uploadImage (uri, long,att,mime = 'image/jpeg')  {
-    return new Promise((resolve, reject) => {
-      const uploadUri = Platform.OS === 'ios' ? uri.replace('file://', '') : uri
-      const sessionId = new Date().getTime()
-      let uploadBlob = null
-      const imageRef = storage.ref('images').child(`${sessionId}`)
-      fs.readFile(uploadUri, 'base64')
-      .then((data) => {
-        return Blob.build(data, { type: `${mime};BASE64` })
-      })
-      .then((blob) => {
-        uploadBlob = blob
-        return imageRef.put(blob, { contentType: mime })
-      })
-      .then(() => {
-        uploadBlob.close()
-        return imageRef.getDownloadURL()
-      })
-      .then((url) => {
-        console.log(long)
-        var that = this;
-        App.database().ref('users').push({url: url,l:long,a:att}).then(function(){
-        that.goToFriendMessage(long)
-       })
-        resolve(url)
-      })
-      .catch((error) => {
-        reject(error)
-      })
-    })
-  }
+
+uploadImage (uri,mime = 'image/jpeg')  {
+  return new Promise((resolve, reject) => {
+    const uploadUri = Platform.OS === 'ios' ? uri.replace('file://', '') : uri
+  const sessionId = new Date().getTime()
+let uploadBlob = null
+const imageRef = storage.ref('images').child(`${sessionId}`)
+fs.readFile(uploadUri, 'base64')
+.then((data) => {
+  return Blob.build(data, { type: `${mime};BASE64` })
+})
+.then((blob) => {
+  uploadBlob = blob
+  return imageRef.put(blob, { contentType: mime })
+})
+.then(() => {
+  uploadBlob.close()
+  return imageRef.getDownloadURL()
+})
+.then((url) => {
+  var that = this;
+  App.database().ref('users').push({url: url,l:this.state.lastPosition.Long,a:this.state.lastPosition.att}).then(function(){
+    that.goToFriendMessage()
+  })
+  resolve(url)
+})
+.catch((error) => {
+  reject(error)
+})
+})
+}
 setImage() {
    this.setState({opacity: 1});
 }
-  _pickImage() {
-    this.setState({ uploadURL: '' })
-    ImagePicker.launchImageLibrary({}, response => {
-      uploadImage(response.uri)
-      .then(url => this.setState({ uploadURL: url }))
-      .catch(error => console.log(error))
-    })
-  }
-  readQR(e) {
-    //console.error(e);
-    if (e.data) {
-      if (e.data == 'Hello :)') {
-        this.setState({ opacity: 1 });
-      } else {
-        this.setState({ opacity: 0 });
-      }
-      this.setState({ bounds: e, data: e.data });
-    }
-  }
-  render() {
-    return (
-      <View style={styles.container}>
-      <Camera 
-      ref={(cam) => {
-        this.camera = cam;
-      } }
-      style={styles.preview}
-      aspect={Camera.constants.Aspect.fill} onBarCodeRead={this.readQR.bind(this)} >
-       
-      <TouchableHighlight onPress={this.goToFriendMessage.bind(this,this.state.lastPosition.Long)}>
+
+render() {
+  return (
+    <View style={styles.container}>
+    <Camera 
+    ref={(cam) => {
+      this.camera = cam;
+    } }
+    style={styles.preview}
+    >
+
+      <TouchableHighlight onPress={this.goToFriendMessage.bind(this)}>
 
         <Animated.Image
     style={{
@@ -153,48 +163,54 @@ setImage() {
           ],
           height:500,
           width:500,
-           opacity:this.state.opacity,
+           opacity: this.state.opacity,
         }}
         source={require('./../assets/img/pin2.png')}
         />
         </TouchableHighlight>
 
- <Icon name="camera" size={100}  onPress={this.goToFriendMessage.bind(this,this.state.lastPosition.Long)} />
-    
-      {
-        (() => {
-          switch (this.state.uploadURL) {
-            case null:
-            return null
-            case '':
-            return <ActivityIndicator />
-            default:
-            return (
-              <View>
-              <Image
-              source={{ uri: this.state.uploadURL }}
-              style={styles.image}
-              />
-              <Text>{this.state.uploadURL}</Text>
-              </View>
-              )
-            }
-          })()
-        }
-        
-        </Camera>
-        </View>
-        );
+          <Icon name="camera" size={100}  onPress={this.takePicture.bind(this)}  />
+
+          {
+            (() => {
+              switch (this.state.uploadURL) {
+                case null:
+                return null
+                case '':
+                return <ActivityIndicator />
+                default:
+                return (
+                  <View>
+                  <Image
+                  source={{ uri: this.state.uploadURL }}
+                  style={styles.image}
+                  />
+                  <Text>{this.state.uploadURL}</Text>
+                  </View>
+                  )
+              }
+            })()
           }
-          takePicture(location) {
-            console.log(location)
-            this.camera.capture()
-            .then((data) => this.uploadImage(data.path,location.Long,location.att))
-            .catch(err => console.error(err));
-          }
-          goToFriendMessage (long) {console.log('bef'), Actions.friendMessage({ long:long }), console.log('after')};
+
+          </Camera>
+          </View>
+          );
+}
+takePicture() {
+  console.log('batataaaaa')
+  this.camera.capture()
+  .then((data) => this.uploadImage(data.path))
+  .catch(err => console.error(err));
+}
+goToFriendMessage () {
+  
+  console.log('here')
+
+            Actions.friendMessage({ imageArray:tempArray });
+
         }
-        const styles = StyleSheet.create({
+      }
+          const styles = StyleSheet.create({
           container: {
             flex: 1
           },
