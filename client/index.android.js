@@ -15,8 +15,8 @@ export default class locMemo extends Component {
     return (
       <Router>
         <Scene key="root">
-          <Scene key="camHomePage" component={camHomePage} title="camHomePage" hideNavBar={true} initial={true} />
-          <Scene key="friendMessage" component={friendMessage} hideNavBar={true} title="friendMessage" />
+          <Scene key="camHomePage" component={camHomePage} title="camHomePage"  initial={true} />
+          <Scene key="friendMessage" component={friendMessage}  title="friendMessage" />
         </Scene>
       </Router>
     )
