@@ -28,7 +28,7 @@
 
 
 
-![](screenShot/demo.gif)
+![demo](demo.gif)
 
 > check the landing page to see the video in high reoluation:
 [Click Here](http://locmemoo.herokuapp.com)
@@ -61,7 +61,7 @@ gulp
 
 
 ## Architecture Diagram:
-![Architecture Diagram](screenShot/SystemArchitecture.png)
+![Architecture Diagram](SystemArchitecture.png)
 
 ## Requirements
 
