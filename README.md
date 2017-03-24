@@ -4,7 +4,6 @@
 > locMemo is a react native application that allowes you to store your memories on certin locations , and ONLY view memories when you pass by that location !
 
 
-
 ## Team
 
   - __Product Owner__: Sajedah Yousef
@@ -29,13 +28,11 @@
 
 ![demo](demo.gif)
 
-> check the landing page to see the video in high reoluation:
+> check the landing page to see the video in high resolution:
 [Click Here](http://locmemoo.herokuapp.com)
 
 > download the app on your phone from the link on the landing page
 [Click Here](http://locmemoo.herokuapp.com)
-
-
 
 
 ## Architecture
@@ -87,10 +84,6 @@ react-native run-android
 open client/android/ using Android Studio
 
 ```
-
-
-
-
 
 #The Database 
 Our Database and Storage is built firebase, which holds url, longitude and latitude for each photo
