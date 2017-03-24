@@ -16,12 +16,11 @@
 1. [Usage](#Usage)
 1. [Architecture](#architecture)
     1. [Tech Stack](#tech-stack)
-    1. [System Architecture](#system-architecture)
+    1. [Architecture Diagram](#Architecture-Diagram)
 1. [Requirements](#requirements)
 1. [Development](#development)
     1. [Installing Dependencies](#installing-dependencies)
     1. [Tasks](#tasks)
-1. [Team](#team)
 1. [Contributing](#contributing)
 
 ## Usage
@@ -38,13 +37,6 @@
 
 
 
-
-
-
-## styling guide
-```sh
-gulp
-```
 
 ## Architecture
 
@@ -65,6 +57,9 @@ gulp
 
 ## Requirements
 
+
+- react-native
+- firebase
 
 ## Development
 
