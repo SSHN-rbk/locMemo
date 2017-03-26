@@ -1,7 +1,7 @@
 
 # locMemo 
 
-> locMemo is a react native application that allowes you to store your memories on certin locations , and ONLY view memories when you pass by that location !
+> locMemo is a react native application that allows you to store your memories on certain locations , and ONLY view those memories by passing by that location 
 
 
 ## Team
