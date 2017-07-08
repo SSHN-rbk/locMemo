@@ -65,7 +65,7 @@
 From within the root directory:
 
 ```sh
-git clone https://github.com/Sportitsu/Zarad.git
+git clone https://github.com/SSHN-rbk/locMemo.git
 ```
 
 ```sh
